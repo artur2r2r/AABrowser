@@ -50,9 +50,9 @@ Transform your "parked time" with a sleek, modern browser designed specifically 
 
 #### 🛑 Developer's Safety Request
 
-* **Driver's Duty:** If you're the one steering, **DO NOT LOOK AT THIS APP.** If you think your eyes might wander while driving, **uninstall it right now!** Seriously, your safety is my top priority.
-* **Passenger's Joy:** This app is for your passengers or for when you are safely parked.
-* **Legal Note:** I built the code, but the **GPLv3 license** means I am **NOT RESPONSIBLE** for your actions. Drive smart!
+- **Driver's Duty:** If you're the one steering, **DO NOT LOOK AT THIS APP.** If you think your eyes might wander while driving, **uninstall it right now!** Seriously, your safety is my top priority.
+- **Passenger's Joy:** This app is for your passengers or for when you are safely parked.
+- **Legal Note:** I built the code, but the **GPLv3 license** means I am **NOT RESPONSIBLE** for your actions. Drive smart!
 
 ---
 
@@ -76,7 +76,7 @@ If the app fails to launch, try opening a non-Google Maps navigation app (such a
 
 ## ⚠️ Current Issues
 
-- 🚫 **No Ad Blocking:** Ad filtering is not currently implemented.
+- 🚫 **No Ad Blocking:** Ad filtering is not currently implemented. *(💡 **Tip:** If you want to use your own favorite browser with built-in ad-blocking or other apps like VLC on Android Auto, check out **[AA Anything](https://github.com/kododake/AAAnything)**, another app I built!)*
 - 🚗 **Stationary Use Only**
 
 ---
@@ -118,7 +118,7 @@ Every contribution makes AA Browser better!
         <img src="https://github.com/SaveEditors.png?s=100" width="60" alt="SaveEditors"/><br />
         <sub><b>SaveEditors</b></sub>
       </a><br />
-      <sub>Multi-tab support,Original Home screen</sub>
+      <sub>Multi-tab support, Original Home screen</sub>
     </td>
     <td align="center" valign="top" width="20%">
       <a href="https://github.com/gregorixG">
@@ -150,33 +150,40 @@ I care about the app's growth, but I care about your privacy even more. This app
 
 ---
 
-## ☕ Support a Student Developer & Project Sustainability
+## <img src="https://github.com/kododake/AAAnything/blob/main/assets/icon.png?raw=true" width="32" height="32" valign="middle" alt="AA Anything Logo" /> Want More Than a Browser? Try **AA Anything**!
 
-> [!WARNING]
-> ### ⚠️ An Urgent Reality Check from the Developer
-> 
-> AA Browser now serves over **50,000 daily users** and **1.5 million monthly users**. However, despite this massive scale, **donations over the last 2+ months have been literally $0 (¥0)**.
-> 
-> As a solo student developer balancing studies while single-handedly managing infrastructure costs, device testing, and frequent Android Auto breakages, **this situation has become critically tough and unsustainable.**
-> 
-> Continuous active development, timely bug fixes, and critical security patches require real resources. **Even a single cup of coffee makes an immense difference** and directly keeps this project alive, safe, and evolving.
-> 
-> If AA Browser brings convenience or fun to your drives, please consider chipping in:
-> 
-> 👉 **[Support on Buy Me a Coffee](https://buymeacoffee.com/kododake)** ☕✨  
-> 👉 **[Sponsor on GitHub Sponsors](https://github.com/sponsors/kododake)** 💖
+Love **AA Browser**, but wish you could also run your other favorite apps on your car's screen? Check out **[AA Anything](https://github.com/kododake/AAAnything)** — a brand-new tool I built to unlock your dashboard for everyday Android apps!
+
+- 🎬 **Bring Your Apps to the Dash:** Project media players (like **VLC** — completely free to use!), plus unlock third-party web browsers, finance trackers, and handy utilities directly on Android Auto *(excluding apps with strict DRM or Play Integrity restrictions)*.
+- 📱 **No Root, No PC Required:** Forget complicated ADB commands. Everything happens right on your phone in just a few taps—pick an app, tap **Patch & Install**, and plug in!
+- 🔄 **Effortless In-Place Updates:** Keep all your app data and login sessions intact when updating apps or after Android system updates.
+- 🛡️ **100% Safe for Your Vehicle:** Operates purely over standard Android Auto projection on **Android 15+** with zero modifications to your car's head unit.
+
+<div align="center">
+  <a href="https://github.com/kododake/AAAnything">
+    <img src="https://img.shields.io/badge/Explore-AA_Anything-blue?style=for-the-badge&logo=github&logoColor=white" height="40" alt="Explore AA Anything">
+  </a>
+  &nbsp;
+  <a href="https://github.com/kododake/AAAnything/releases/latest">
+    <img src="https://img.shields.io/badge/Get_It_On-GitHub_Releases-181717?style=for-the-badge&logo=github&logoColor=white" height="40" alt="Get AA Anything on GitHub Releases">
+  </a>
+</div>
+
+---
+
+## ☕ Support the Project
+
+I'm a solo student developer building and maintaining **AA Browser** in my spare time (mostly while fighting `./gradlew` crashes on my machine 😅). If this app makes your parked breaks or road trips a little more enjoyable, please consider buying me a coffee! Your support helps keep me caffeinated, upgrade my dev environment, and keep this project alive.
 
 <div align="center">
   <a href="https://buymeacoffee.com/kododake">
     <img src="docs/img/bmc-white-button.png" alt="Buy Me A Coffee" height="48">
   </a>
+  &nbsp;
   <a href="https://github.com/sponsors/kododake">
     <img src="https://img.shields.io/badge/Sponsor_on-GitHub-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white" height="48" alt="Sponsor on GitHub">
   </a>
 </div>
-https://buymeacoffee.com/kododake
-
-https://github.com/sponsors/kododake
 
 *If you sponsor the project, please let me know in the Discussions! I'd love to add you to our sponsors list as a token of my gratitude.*
 
