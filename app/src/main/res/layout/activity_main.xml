@@ -5,10 +5,18 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
+    <!-- Split screen host: [browser | divider | pinned pane]. Pane/divider are gone unless split screen is on. -->
+    <LinearLayout
+        android:id="@+id/splitRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
     <FrameLayout
         android:id="@+id/contentRoot"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
 
         <FrameLayout
             android:id="@+id/webViewContainer"
@@ -62,6 +70,44 @@
             android:elevation="8dp" />
 
     </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/splitDivider"
+            android:layout_width="@dimen/split_divider_width"
+            android:layout_height="match_parent"
+            android:background="?attr/colorSurface"
+            android:contentDescription="@string/split_screen_divider"
+            android:visibility="gone">
+
+            <View
+                android:layout_width="4dp"
+                android:layout_height="56dp"
+                android:layout_gravity="center"
+                android:background="@drawable/split_divider_handle" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:id="@+id/splitPaneRoot"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/colorSurface"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <androidx.compose.ui.platform.ComposeView
+                android:id="@+id/splitPaneToolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <FrameLayout
+                android:id="@+id/splitPaneWebViewContainer"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+        </LinearLayout>
+
+    </LinearLayout>
 
     <FrameLayout
         android:id="@+id/menuOverlay"

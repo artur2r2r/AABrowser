@@ -22,6 +22,7 @@
     <dimen name="icon_button_size">48dp</dimen>
     <dimen name="icon_size_small">20dp</dimen>
     <dimen name="icon_size_medium">24dp</dimen>
+    <dimen name="split_divider_width">20dp</dimen>
 </resources>
 
 

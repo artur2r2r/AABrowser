@@ -19,6 +19,7 @@ package com.kododake.aabrowser.ui.compose.screens.menu
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Fullscreen
+import androidx.compose.material.icons.rounded.VerticalSplit
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -35,6 +36,21 @@ fun MenuFullscreenSwitchCard(
         icon = Icons.Rounded.Fullscreen,
         isChecked = isFullscreenMode,
         onCheckedChange = onFullscreenToggle,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun MenuSplitScreenSwitchCard(
+    isSplitScreenMode: Boolean,
+    onSplitScreenToggle: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    MenuSwitchCard(
+        title = stringResource(R.string.menu_split_screen),
+        icon = Icons.Rounded.VerticalSplit,
+        isChecked = isSplitScreenMode,
+        onCheckedChange = onSplitScreenToggle,
         modifier = modifier
     )
 }

@@ -111,6 +111,13 @@ fun BrowserMenuSheet(
                 onFullscreenToggle = actions.onFullscreenToggle
             )
 
+            Spacer(Modifier.height(8.dp))
+
+            MenuSplitScreenSwitchCard(
+                isSplitScreenMode = stateHolder.isSplitScreenMode,
+                onSplitScreenToggle = actions.onSplitScreenToggle
+            )
+
             Spacer(Modifier.height(4.dp))
 
             MenuFooter(

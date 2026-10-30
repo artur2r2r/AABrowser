@@ -233,4 +233,19 @@
     <string name="settings_start_page_show_aa_anything_desc">Display introduction card on start page</string>
     <string name="settings_start_page_about_aa_anything">About AA Anything</string>
     <string name="settings_start_page_about_aa_anything_desc">Open latest release on phone</string>
+    <!-- Split screen -->
+    <string name="menu_split_screen">Split screen</string>
+    <string name="split_screen_divider">Drag to resize split screen</string>
+    <string name="split_screen_back">Back</string>
+    <string name="split_screen_reload">Reload</string>
+    <string name="split_screen_home">Home</string>
+    <string name="split_screen_edit_url">Change site</string>
+    <string name="split_screen_swap">Swap sides</string>
+    <string name="split_screen_close">Close split screen</string>
+    <string name="split_screen_desktop">Desktop site</string>
+    <string name="split_screen_url_dialog_title">Split screen site</string>
+    <string name="split_screen_url_dialog_message">Site shown in the second half of the screen</string>
+    <string name="split_screen_url_dialog_reset">Slack (default)</string>
+    <string name="split_screen_url_dialog_save">Open</string>
+    <string name="split_screen_url_dialog_cancel">Cancel</string>
 </resources>

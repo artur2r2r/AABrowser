@@ -76,7 +76,8 @@ class MainActivitySetup(
         val updateNavigationButtons: () -> Unit,
         val handleQuickActionButtonPressed: () -> Unit,
         val showStartPage: () -> Unit,
-        val onDesktopModeChanged: (Boolean) -> Unit
+        val onDesktopModeChanged: (Boolean) -> Unit,
+        val onSplitScreenToggle: (Boolean) -> Unit = {}
     )
 
     fun initializeUi(
@@ -129,6 +130,10 @@ class MainActivitySetup(
                 BrowserPreferences.setFullscreenMode(activity, isChecked)
                 managers.uiManager.setImmersiveMode(isChecked)
                 managers.uiManager.menuHelper.stateHolder.isFullscreenMode = isChecked
+            },
+            onSplitScreenToggle = { isChecked ->
+                actions.onSplitScreenToggle(isChecked)
+                managers.uiManager.hideMenuOverlay()
             },
             onNewTab = {
                 managers.tabManager.createNewTab(true)

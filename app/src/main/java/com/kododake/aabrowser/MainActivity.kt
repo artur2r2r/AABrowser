@@ -38,6 +38,7 @@ import com.kododake.aabrowser.main.MainActivityCallbackFactory
 import com.kododake.aabrowser.main.MenuFabController
 import com.kododake.aabrowser.main.WebViewWarmupHelper
 import com.kododake.aabrowser.model.QuickActionButtonMode
+import com.kododake.aabrowser.split.SplitScreenController
 import com.kododake.aabrowser.tabs.BrowserTab
 import com.kododake.aabrowser.ui.MainActivitySetup
 import com.kododake.aabrowser.ui.controllers.NavigationButtonUpdater
@@ -76,6 +77,17 @@ class MainActivity : AppCompatActivity(), MainActivityCallbackFactory.CallbackHo
 
     private val progressController: ProgressIndicatorController by lazy {
         ProgressIndicatorController(binding.progressComposeView)
+    }
+
+    private val splitScreenController: SplitScreenController by lazy {
+        SplitScreenController(
+            activity = this,
+            binding = binding,
+            openInMainBrowser = { url -> managers.navigationManager.loadUrlFromIntent(url) },
+            onEnabledChanged = { enabled ->
+                managers.uiManager.menuHelper.stateHolder.isSplitScreenMode = enabled
+            }
+        )
     }
 
     var webView: WebView? = null
@@ -136,6 +148,7 @@ class MainActivity : AppCompatActivity(), MainActivityCallbackFactory.CallbackHo
     override fun onResume() {
         super.onResume()
         webView?.onResume()
+        splitScreenController.onResume()
         managers.themeManager.applyMenuHeaderColors()
         managers.bookmarkManager.refreshBookmarks()
         managers.tabManager.refreshTabs()
@@ -147,12 +160,14 @@ class MainActivity : AppCompatActivity(), MainActivityCallbackFactory.CallbackHo
     override fun onPause() {
         managers.uiManager.exitFullscreen()
         webView?.onPause()
+        splitScreenController.onPause()
         managers.tabManager.persistTabSession()
         super.onPause()
     }
 
     override fun onDestroy() {
         menuFabController.cleanup()
+        splitScreenController.onDestroy()
         managers.uiManager.exitFullscreen()
         managers.startPageManager.onDestroy()
         managers.tabManager.destroy()
@@ -182,13 +197,15 @@ class MainActivity : AppCompatActivity(), MainActivityCallbackFactory.CallbackHo
                 showStartPage = ::showStartPage,
                 onDesktopModeChanged = { isChecked ->
                     managers.tabManager.updateDesktopMode(isChecked, BrowserPreferences.getUserAgentProfile(this))
-                }
+                },
+                onSplitScreenToggle = { enabled -> splitScreenController.setEnabled(enabled) }
             )
         )
         setup.initializeUi(
             intentUrl = managers.navigationManager.extractBrowsableUrl(intent),
             shouldForceSessionRestore = shouldForceSessionRestore
         )
+        splitScreenController.initialize()
 
         updateNavigationButtons()
         managers.tabManager.refreshTabs()
