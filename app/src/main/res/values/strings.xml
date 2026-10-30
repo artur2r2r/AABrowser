@@ -233,4 +233,7 @@
     <string name="settings_start_page_show_aa_anything_desc">Display introduction card on start page</string>
     <string name="settings_start_page_about_aa_anything">About AA Anything</string>
     <string name="settings_start_page_about_aa_anything_desc">Open latest release on phone</string>
+    <string name="media_notification_channel_name">Media playback</string>
+    <string name="media_notification_channel_description">Controls media playback in web pages</string>
+    <string name="media_notification_content_text">Playing media in WebView</string>
 </resources>
