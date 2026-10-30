@@ -21,6 +21,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.webkit.WebView
 import androidx.activity.result.contract.ActivityResultContracts
@@ -37,6 +39,7 @@ import com.kododake.aabrowser.main.MainActivityBackPressHandler
 import com.kododake.aabrowser.main.MainActivityCallbackFactory
 import com.kododake.aabrowser.main.MenuFabController
 import com.kododake.aabrowser.main.WebViewWarmupHelper
+import com.kododake.aabrowser.media.WebViewMediaSessionBridge
 import com.kododake.aabrowser.model.QuickActionButtonMode
 import com.kododake.aabrowser.tabs.BrowserTab
 import com.kododake.aabrowser.ui.MainActivitySetup
@@ -81,6 +84,45 @@ class MainActivity : AppCompatActivity(), MainActivityCallbackFactory.CallbackHo
     var webView: WebView? = null
         private set
 
+    private val mediaHandler = Handler(Looper.getMainLooper())
+    private var webViewMediaSessionBridge: WebViewMediaSessionBridge? = null
+    private val webStateFetcher = object : Runnable {
+        override fun run() {
+            if (isDestroyed || isFinishing) return
+            webView?.evaluateJavascript(
+                """
+                (function(){
+                    var medias = document.querySelectorAll('video, audio');
+                    for(var i=0; i<medias.length; i++) {
+                        if(!medias[i].paused && !medias[i].muted) {
+                            var dur = isNaN(medias[i].duration) ? 0 : medias[i].duration;
+                            return medias[i].currentTime + ',' + dur + ',' + medias[i].paused;
+                        }
+                    }
+                    if(medias.length > 0) {
+                        var dur = isNaN(medias[0].duration) ? 0 : medias[0].duration;
+                        return medias[0].currentTime + ',' + dur + ',' + medias[0].paused;
+                    }
+                    return '';
+                })();
+                """.trimIndent()
+            ) { result ->
+                if (!result.isNullOrBlank() && result != "\"\"" && result != "null") {
+                    runCatching {
+                        val parts = result.replace("\"", "").split(",")
+                        if (parts.size == 3) {
+                            val current = parts[0].toDouble()
+                            val dur = parts[1].toDouble()
+                            val paused = parts[2].toBoolean()
+                            webViewMediaSessionBridge?.updatePlaybackState(current, dur, paused)
+                        }
+                    }
+                }
+            }
+            mediaHandler.postDelayed(this, 1000L)
+        }
+    }
+
     override var currentUrl: String = ""
         private set
 
@@ -118,6 +160,7 @@ class MainActivity : AppCompatActivity(), MainActivityCallbackFactory.CallbackHo
         managers.umamiTracker.trackEvent("app_open")
         setupUi()
         setupBackPressHandling()
+        setupMediaSessionBridge()
 
         managers.permissionManager.ensureNotificationPermissionIfNeeded(REQUEST_CODE_POST_NOTIFICATIONS)
         FreeDroidWarnHelper.checkAndShow(this, managers.themeManager.resolveThemeColor(androidx.appcompat.R.attr.colorError)) { url ->
@@ -133,8 +176,14 @@ class MainActivity : AppCompatActivity(), MainActivityCallbackFactory.CallbackHo
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        webViewMediaSessionBridge?.onHostResume()
+    }
+
     override fun onResume() {
         super.onResume()
+        mediaHandler.post(webStateFetcher)
         webView?.onResume()
         managers.themeManager.applyMenuHeaderColors()
         managers.bookmarkManager.refreshBookmarks()
@@ -145,15 +194,24 @@ class MainActivity : AppCompatActivity(), MainActivityCallbackFactory.CallbackHo
     }
 
     override fun onPause() {
+        mediaHandler.removeCallbacks(webStateFetcher)
         managers.uiManager.exitFullscreen()
         webView?.onPause()
         managers.tabManager.persistTabSession()
         super.onPause()
     }
 
+    override fun onStop() {
+        webViewMediaSessionBridge?.onHostPause()
+        super.onStop()
+    }
+
     override fun onDestroy() {
+        mediaHandler.removeCallbacks(webStateFetcher)
         menuFabController.cleanup()
         managers.uiManager.exitFullscreen()
+        webViewMediaSessionBridge?.release()
+        webViewMediaSessionBridge = null
         managers.startPageManager.onDestroy()
         managers.tabManager.destroy()
         webView = null
@@ -264,10 +322,14 @@ class MainActivity : AppCompatActivity(), MainActivityCallbackFactory.CallbackHo
             BrowserPreferences.shouldUseDesktopMode(this)
         )
     }
-    override fun onUrlChanged(url: String) { currentUrl = url }
+    override fun onUrlChanged(url: String) {
+        currentUrl = url
+        webViewMediaSessionBridge?.updateNowPlaying(currentPageTitle, currentUrl)
+    }
     override fun onTitleChanged(title: String) {
         currentPageTitle = title
         managers.bookmarkManager.updateBookmarkTitleIfBetter(currentUrl, title)
+        webViewMediaSessionBridge?.updateNowPlaying(currentPageTitle, currentUrl)
     }
     override fun onTabChanged(tab: BrowserTab) {
         webView = tab.webView
@@ -275,6 +337,7 @@ class MainActivity : AppCompatActivity(), MainActivityCallbackFactory.CallbackHo
         currentPageTitle = tab.currentTitle
         managers.bookmarkManager.updateBookmarkTitleIfBetter(tab.currentUrl, tab.currentTitle)
         managers.uiManager.menuHelper.updatePage(tab.currentUrl, tab.currentTitle)
+        webViewMediaSessionBridge?.updateNowPlaying(currentPageTitle, currentUrl)
     }
     override fun onShowStartPage() { showStartPage() }
     override fun onHideStartPage() { hideStartPage() }
@@ -282,4 +345,73 @@ class MainActivity : AppCompatActivity(), MainActivityCallbackFactory.CallbackHo
     override fun onPickBackgroundRequested() { pickStartPageBackgroundLauncher.launch(arrayOf("image/*")) }
     override fun onVersionInfoReceived(latestUrl: String, tagName: String) { latestReleaseUrl = latestUrl }
     override fun onRecreateRequested() { recreate() }
+
+    private fun setupMediaSessionBridge() {
+        webViewMediaSessionBridge = WebViewMediaSessionBridge(
+            context = this,
+            onPlayRequested = {
+                runOnUiThread {
+                    webView?.evaluateJavascript(
+                        "(function(){var m=document.querySelectorAll('video,audio');for(var i=0;i<m.length;i++)m[i].play();})();",
+                        null
+                    )
+                }
+            },
+            onPauseRequested = {
+                runOnUiThread {
+                    webView?.evaluateJavascript(
+                        "(function(){var m=document.querySelectorAll('video,audio');for(var i=0;i<m.length;i++)m[i].pause();})();",
+                        null
+                    )
+                }
+            },
+            onSkipForwardRequested = {
+                runOnUiThread {
+                    webView?.evaluateJavascript(
+                        """
+                        (function(){
+                            var controls = document.querySelectorAll('button, [role="button"], [aria-label], [title], [data-tooltip]');
+                            for (var i = 0; i < controls.length; i++) {
+                                var el = controls[i];
+                                var label = (el.getAttribute('aria-label') || el.getAttribute('title') || el.getAttribute('data-tooltip') || el.textContent || '').toLowerCase();
+                                if (/next|next track|skip/.test(label)) { el.click(); return; }
+                            }
+                            var medias = document.querySelectorAll('video, audio');
+                            for (var i = 0; i < medias.length; i++) medias[i].currentTime += 10;
+                        })();
+                        """.trimIndent(),
+                        null
+                    )
+                }
+            },
+            onSkipBackwardRequested = {
+                runOnUiThread {
+                    webView?.evaluateJavascript(
+                        """
+                        (function(){
+                            var controls = document.querySelectorAll('button, [role="button"], [aria-label], [title], [data-tooltip]');
+                            for (var i = 0; i < controls.length; i++) {
+                                var el = controls[i];
+                                var label = (el.getAttribute('aria-label') || el.getAttribute('title') || el.getAttribute('data-tooltip') || el.textContent || '').toLowerCase();
+                                if (/previous|prev|back/.test(label)) { el.click(); return; }
+                            }
+                            var medias = document.querySelectorAll('video, audio');
+                            for (var i = 0; i < medias.length; i++) medias[i].currentTime -= 10;
+                        })();
+                        """.trimIndent(),
+                        null
+                    )
+                }
+            },
+            onSeekRequested = { positionMs ->
+                runOnUiThread {
+                    webView?.evaluateJavascript(
+                        "(function(){var m=document.querySelectorAll('video,audio');for(var i=0;i<m.length;i++)m[i].currentTime=${positionMs / 1000.0};})();",
+                        null
+                    )
+                }
+            }
+        )
+        webViewMediaSessionBridge?.updateNowPlaying(currentPageTitle, currentUrl)
+    }
 }
